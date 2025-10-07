@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+  min-height: 100vh;
+  background: linear-gradient(120deg, #232526 0%, #8e2de2 100%);
+  color: #f1f1f1;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: rgba(30, 30, 40, 0.95);
+  border-right: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 32px;
+}
+
+.sidebar-header {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #8e2de2;
+  margin-bottom: 32px;
+  padding-left: 24px;
+}
+
+.sidebar ul {
+  list-style: none;
+  width: 100%;
+  padding: 0;
+}
+
+.sidebar ul li {
+  padding: 14px 28px;
+  color: #f1f1f1;
+  font-size: 1.08em;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar ul li.active,
+.sidebar ul li:hover {
+  background: #2d2d3a;
+  color: #8e2de2;
+}
+
+.sidebar ul li i {
+  margin-right: 14px;
+  font-size: 1.1em;
+}
+
+.main {
+  flex: 1;
+  padding: 48px 40px;
+  background: transparent;
+  min-width: 0;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(30, 30, 40, 0.85);
+  border-radius: 14px;
+  box-shadow: 0 4px 24px #8e2de244;
+  padding: 28px 36px;
+  margin-bottom: 36px;
+}
+
+.dashboard-header h1 {
+  font-size: 2em;
+  color: #8e2de2;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: #ccc;
+  font-size: 1em;
+}
+
+.user-avatar img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #8e2de2;
+  box-shadow: 0 2px 8px #4a00e088;
+}
+
+.stats-row {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1 1 180px;
+  min-width: 180px;
+  background: rgba(30, 30, 40, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px #8e2de222;
+  padding: 24px 32px;
+  text-align: left;
+  color: #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stat-title {
+  font-size: 1.1em;
+  color: #8e2de2;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 2em;
+  font-weight: bold;
+  color: #fff;
+}
+
+.recent-activity {
+  margin-top: 24px;
+  padding: 24px 32px;
+  border-radius: 12px;
+  background: rgba(30, 30, 40, 0.85);
+  box-shadow: 0 2px 12px #8e2de222;
+}
+
+.recent-activity h2 {
+  font-size: 1.2em;
+  color: #8e2de2;
+  margin-bottom: 14px;
+}
+
+.recent-activity ul {
+  list-style: none;
+  padding: 0;
+}
+
+.recent-activity li {
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+  color: #f1f1f1;
+  font-size: 1em;
+}
+
+.activity-label {
+  color: #8e2de2;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-header,
+  .recent-activity,
+  .stat-card {
+    padding: 16px 12px;
+  }
+  .stats-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .main {
+    padding: 20px 10px;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+    padding-top: 16px;
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <aside class="sidebar dark-glass">
+      <div class="sidebar-header">
+        <span class="brand">CrowdCount</span>
+      </div>
+      <ul>
+        <li class="active"><i class="fas fa-home"></i> Home</li>
+        <li><i class="fas fa-chart-bar"></i> Analytics</li>
+        <li><i class="fas fa-user"></i> Profile</li>
+        <li><i class="fas fa-cog"></i> Settings</li>
+        <li onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+      </ul>
+    </aside>
+    <main class="main">
+      <header class="dashboard-header dark-glass">
+        <div>
+          <h1>Hello User</h1>
+          <p class="subtitle">Welcome to your analytics dashboard!</p>
+        </div>
+      </header>
+    </main>
+  </div>
+  <script src="https://kit.fontawesome.com/yourkitid.js" crossorigin="anonymous"></script>
+  <script src="script.js"></script>
+</body>
+</html>
