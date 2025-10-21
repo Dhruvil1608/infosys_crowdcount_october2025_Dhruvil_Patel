@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CrowdCount Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(120deg, #232526 0%, #8e2de2 100%);
+      color: #f1f1f1;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .dashboard {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 220px;
+      min-height: 100vh;
+      background: rgba(30, 30, 40, 0.95);
+      border-right: 1px solid #222;
+      display: flex;
+      flex-direction: column;
+      padding-top: 32px;
+    }
+
+    .sidebar-header {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #8e2de2;
+      margin-bottom: 32px;
+      padding-left: 24px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      width: 100%;
+      padding: 0;
+    }
+
+    .sidebar ul li {
+      padding: 14px 28px;
+      color: #f1f1f1;
+      font-size: 1.08em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .sidebar ul li.active,
+    .sidebar ul li:hover {
+      background: #2d2d3a;
+      color: #8e2de2;
+    }
+
+    .sidebar ul li i {
+      margin-right: 14px;
+      font-size: 1.1em;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .dashboard-header {
+      background: rgba(30, 30, 40, 0.85);
+      border-radius: 14px;
+      box-shadow: 0 4px 24px #8e2de244;
+      padding: 28px 36px;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-header h1 {
+      font-size: 2em;
+      color: #8e2de2;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: #ccc;
+      font-size: 1em;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      flex: 1 1 200px;
+      background: rgba(30, 30, 40, 0.85);
+      border-radius: 12px;
+      box-shadow: 0 2px 12px #8e2de222;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .stat-title {
+      font-size: 1em;
+      color: #8e2de2;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .video-section {
+      background: rgba(30, 30, 40, 0.85);
+      border-radius: 14px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .video-controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #232a3b 0%, #8e2de2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px #8e2de244;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-danger {
+      background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+    }
+
+    .btn-success {
+      background: linear-gradient(90deg, #27ae60 0%, #229954 100%);
+    }
+
+    .video-container {
+      position: relative;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-container canvas {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .video-container img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .placeholder {
+      color: #666;
+      font-size: 1.2em;
+    }
+
+    .analytics-section {
+      background: rgba(30, 30, 40, 0.85);
+      border-radius: 14px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 1.5em;
+      color: #8e2de2;
+      margin-bottom: 20px;
+    }
+
+    .chart-container {
+      background: rgba(50, 50, 60, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 300px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ccc;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #8e2de2;
+      border-radius: 8px;
+      background: #232a3b;
+      color: #fff;
+      font-size: 1em;
+    }
+
+    .results-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .result-item {
+      background: rgba(50, 50, 60, 0.6);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .result-label {
+      color: #8e2de2;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+
+    .result-value {
+      font-size: 2em;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    #videoUpload {
+      display: none;
+    }
+
+    .upload-label {
+      background: linear-gradient(90deg, #232a3b 0%, #8e2de2 100%);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s;
+    }
+
+    .upload-label:hover {
+      transform: translateY(-2px);
+    }
+
+    .file-name {
+      color: #8e2de2;
+      margin-left: 15px;
+      font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        min-height: auto;
+      }
+      .dashboard {
+        flex-direction: column;
+      }
+      .main {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="sidebar-header">CrowdCount</div>
+      <ul>
+        <li class="active" onclick="showSection('home')">
+          <i class="fas fa-home"></i> Home
+        </li>
+        <li onclick="showSection('video')">
+          <i class="fas fa-film"></i> Video Analysis
+        </li>
+        <li onclick="showSection('webcam')">
+          <i class="fas fa-video"></i> Webcam Analysis
+        </li>
+        <li onclick="showSection('analytics')">
+          <i class="fas fa-chart-bar"></i> Analytics
+        </li>
+        <li onclick="showSection('settings')">
+          <i class="fas fa-cog"></i> Settings
+        </li>
+        <li onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="dashboard-header">
+        <h1>Hello <span id="username">User</span></h1>
+        <p class="subtitle">Real-time crowd monitoring and analytics</p>
+      </header>
+
+      <!-- Home Section -->
+      <div id="homeSection" class="content-section">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-title">Total People Today</div>
+            <div class="stat-value" id="totalCount">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Active Sessions</div>
+            <div class="stat-value" id="activeSessions">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Total Detections</div>
+            <div class="stat-value" id="detectionRate">0</div>
+          </div>
+        </div>
+
+        <div class="video-section">
+          <h2 class="section-title">🎬 Quick Start</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">
+            Start analyzing people with our advanced detection system
+          </p>
+          <div class="video-controls">
+            <button class="btn btn-success" onclick="showSection('webcam')">
+              <i class="fas fa-video"></i> Start Webcam Analysis
+            </button>
+            <button class="btn" onclick="showSection('video')">
+              <i class="fas fa-film"></i> Upload Video
+            </button>
+            <button class="btn" onclick="showSection('analytics')">
+              <i class="fas fa-chart-bar"></i> View Analytics
+            </button>
+          </div>
+        </div>
+
+        <div class="video-section">
+          <h2 class="section-title">📊 Recent Activity</h2>
+          <div id="recentActivity" style="color: #ccc;">
+            Loading recent detections...
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Analysis Section -->
+      <div id="videoSection" class="content-section" style="display:none;">
+        <div class="video-section">
+          <h2 class="section-title">🎬 Video Analysis</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Upload a video file to analyze people detection and line crossing</p>
+          
+          <div class="video-controls">
+            <label for="videoUpload" class="upload-label">
+              <i class="fas fa-upload"></i> Upload Video
+            </label>
+            <input type="file" id="videoUpload" accept="video/*" onchange="handleVideoUpload(event)">
+            <span class="file-name" id="fileName"></span>
+            <button class="btn btn-success" onclick="startVideoAnalysis()" id="analyzeBtn" disabled>
+              <i class="fas fa-play"></i> Start Analysis
+            </button>
+            <button class="btn" onclick="pauseVideoAnalysis()" id="pauseBtn" disabled>
+              <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="btn" onclick="drawVideoLine()" id="drawLineBtn" disabled>
+              <i class="fas fa-minus"></i> Draw Line
+            </button>
+            <button class="btn btn-danger" onclick="resetVideoAnalysis()">
+              <i class="fas fa-redo"></i> Reset
+            </button>
+          </div>
+
+          <div class="video-container" id="videoContainer">
+            <canvas id="videoCanvas" style="display:none;"></canvas>
+            <span class="placeholder" id="videoPlaceholder">Upload a video to begin</span>
+          </div>
+
+          <div class="results-panel">
+            <div class="result-item">
+              <div class="result-label">✅ People Detected</div>
+              <div class="result-value" id="videoPeopleCount">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">🚶 Line Crossings</div>
+              <div class="result-value" id="lineCrossings">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">⏱ Duration</div>
+              <div class="result-value" id="analysisDuration">0s</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">📊 Status</div>
+              <div class="result-value" id="analysisStatus" style="font-size: 1.2em;">Ready</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webcam Analysis Section -->
+      <div id="webcamSection" class="content-section" style="display:none;">
+        <div class="video-section">
+          <h2 class="section-title">🎥 Webcam Analysis</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Real-time people detection and line crossing analysis</p>
+          
+          <div class="video-controls">
+            <button class="btn btn-success" onclick="startWebcamAnalysis()" id="startWebcamBtn">
+              <i class="fas fa-video"></i> Start Webcam
+            </button>
+            <button class="btn btn-danger" onclick="stopWebcamAnalysis()" id="stopWebcamBtn" disabled>
+              <i class="fas fa-stop"></i> Stop
+            </button>
+            <button class="btn" onclick="drawWebcamLine()" id="drawWebcamLineBtn" disabled>
+              <i class="fas fa-minus"></i> Draw Line
+            </button>
+            <button class="btn" onclick="saveWebcamSession()" id="saveWebcamBtn" disabled>
+              <i class="fas fa-save"></i> Save Session
+            </button>
+            <button class="btn" onclick="resetWebcamAnalysis()">
+              <i class="fas fa-redo"></i> Reset
+            </button>
+          </div>
+
+          <div class="video-container">
+            <canvas id="webcamCanvas" style="display:none;"></canvas>
+            <span class="placeholder" id="webcamPlaceholder">Click Start Webcam to begin</span>
+          </div>
+
+          <div class="results-panel">
+            <div class="result-item">
+              <div class="result-label">👥 Current People</div>
+              <div class="result-value" id="webcamPeopleCount">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">🚶 Line Crossings</div>
+              <div class="result-value" id="webcamLineCrossings">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">⏱ Session Time</div>
+              <div class="result-value" id="webcamSessionTime">0s</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">📊 Status</div>
+              <div class="result-value" id="webcamStatus" style="font-size: 1.2em;">Inactive</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Section -->
+      <div id="analyticsSection" class="content-section" style="display:none;">
+        <div class="analytics-section">
+          <h2 class="section-title">📊 Analytics Dashboard</h2>
+          <div style="margin-bottom: 20px;">
+            <button class="btn" onclick="filterAnalytics('today')">
+              <i class="fas fa-calendar-day"></i> Today
+            </button>
+            <button class="btn" onclick="filterAnalytics('week')">
+              <i class="fas fa-calendar-week"></i> This Week
+            </button>
+            <button class="btn" onclick="filterAnalytics('all')">
+              <i class="fas fa-calendar"></i> All Time
+            </button>
+          </div>
+          <div class="chart-container" id="chartContainer">
+            <p style="color: #ccc; text-align: center; padding-top: 50px;">
+              Loading analytics data...
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Section -->
+      <div id="settingsSection" class="content-section" style="display:none;">
+        <div class="video-section">
+          <h2 class="section-title">⚙️ Settings</h2>
+          <div class="input-group">
+            <label>Camera Source (0 for webcam, or IP camera URL)</label>
+            <input type="text" id="cameraSource" value="0" />
+          </div>
+          <div class="input-group">
+            <label>Detection Confidence Threshold</label>
+            <input type="range" id="confidenceThreshold" min="0" max="100" value="50" />
+            <span id="confidenceValue">50%</span>
+          </div>
+          <button class="btn btn-success" onclick="saveSettings()">
+            <i class="fas fa-save"></i> Save Settings
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:5000";
+    let user = null;
+    
+    // Video Analysis variables
+    let uploadedVideo = null;
+    let videoLine = null;
+    let videoAnalysisInterval = null;
+    let isDrawingVideoLine = false;
+    let videoLineStart = null;
+    let videoStartTime = 0;
+    let videoCanvas, videoCtx;
+    let isAnalyzing = false;
+    
+    // Webcam Analysis variables
+    let webcamLine = null;
+    let webcamAnalysisInterval = null;
+    let isDrawingWebcamLine = false;
+    let webcamLineStart = null;
+    let webcamStartTime = 0;
+    let webcamActive = false;
+    let webcamCanvas, webcamCtx;
+
+    window.onload = function() {
+      const storedUser = localStorage.getItem('user');
+      user = storedUser ? JSON.parse(storedUser) : {username: 'Guest', id: 1};
+      document.getElementById('username').textContent = user.username;
+      
+      videoCanvas = document.getElementById('videoCanvas');
+      videoCtx = videoCanvas.getContext('2d');
+      
+      webcamCanvas = document.getElementById('webcamCanvas');
+      webcamCtx = webcamCanvas.getContext('2d');
+      
+      const confidenceSlider = document.getElementById('confidenceThreshold');
+      if (confidenceSlider) {
+        confidenceSlider.addEventListener('input', function(e) {
+          document.getElementById('confidenceValue').textContent = e.target.value + '%';
+        });
+      }
+      
+      // Load home stats
+      loadHomeStats();
+    };
+
+    async function loadHomeStats() {
+      try {
+        const res = await fetch(`${API_BASE}/get_analytics/${user.id}`);
+        const data = await res.json();
+        
+        if (data.success && data.analytics.length > 0) {
+          // Calculate today's stats
+          const today = new Date().toDateString();
+          let todayTotal = 0;
+          let todaySessions = 0;
+          
+          data.analytics.forEach(log => {
+            const logDate = new Date(log.timestamp).toDateString();
+            if (logDate === today) {
+              todayTotal += log.total_count;
+              todaySessions++;
+            }
+          });
+          
+          document.getElementById('totalCount').textContent = todayTotal;
+          document.getElementById('activeSessions').textContent = todaySessions;
+          document.getElementById('detectionRate').textContent = data.analytics.length;
+          
+          // Show recent activity
+          const recentDiv = document.getElementById('recentActivity');
+          recentDiv.innerHTML = '';
+          const recent = data.analytics.slice(0, 3);
+          recent.forEach(log => {
+            const actDiv = document.createElement('div');
+            actDiv.style.cssText = 'background: rgba(50,50,60,0.4); padding: 10px; border-radius: 6px; margin-bottom: 10px;';
+            const time = new Date(log.timestamp).toLocaleString();
+            actDiv.innerHTML = `<strong>${log.total_count} people</strong> detected at ${time}`;
+            recentDiv.appendChild(actDiv);
+          });
+        }
+      } catch (err) {
+        console.error('Error loading stats:', err);
+      }
+    }
+
+    function showSection(section) {
+      const sections = document.querySelectorAll('.content-section');
+      sections.forEach(s => s.style.display = 'none');
+      
+      const menuItems = document.querySelectorAll('.sidebar li');
+      menuItems.forEach(li => li.classList.remove('active'));
+      
+      const sectionMap = {
+        'home': 0,
+        'video': 1,
+        'webcam': 2,
+        'analytics': 3,
+        'settings': 4
+      };
+      
+      const index = sectionMap[section];
+      if (index !== undefined) {
+        document.getElementById(section + 'Section').style.display = 'block';
+        menuItems[index].classList.add('active');
+        
+        if (section === 'analytics') {
+          loadAnalytics('all');
+        } else if (section === 'home') {
+          loadHomeStats();
+        }
+      }
+    }
+
+    // ==================== VIDEO ANALYSIS ====================
+    
+    function handleVideoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      document.getElementById('fileName').textContent = file.name;
+      uploadedVideo = document.createElement('video');
+      const url = URL.createObjectURL(file);
+      uploadedVideo.src = url;
+      uploadedVideo.load();
+      
+      uploadedVideo.onloadedmetadata = function() {
+        videoCanvas.width = uploadedVideo.videoWidth;
+        videoCanvas.height = uploadedVideo.videoHeight;
+        
+        // Draw first frame
+        videoCtx.drawImage(uploadedVideo, 0, 0);
+        
+        document.getElementById('videoPlaceholder').style.display = 'none';
+        videoCanvas.style.display = 'block';
+        document.getElementById('analyzeBtn').disabled = false;
+        document.getElementById('drawLineBtn').disabled = false;
+        document.getElementById('analysisStatus').textContent = 'Ready';
+      };
+    }
+
+    function drawVideoLine() {
+      if (isDrawingVideoLine) {
+        isDrawingVideoLine = false;
+        videoLineStart = null;
+        videoCanvas.style.cursor = 'default';
+        return;
+      }
+      
+      isDrawingVideoLine = true;
+      videoCanvas.style.cursor = 'crosshair';
+      alert('Click two points on the video to draw a crossing line');
+      
+      videoCanvas.onclick = function(e) {
+        if (!isDrawingVideoLine) return;
+        
+        const rect = videoCanvas.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * videoCanvas.width;
+        const y = ((e.clientY - rect.top) / rect.height) * videoCanvas.height;
+        
+        if (!videoLineStart) {
+          videoLineStart = {x: Math.floor(x), y: Math.floor(y)};
+          
+          // Draw start point
+          videoCtx.fillStyle = '#ff0000';
+          videoCtx.beginPath();
+          videoCtx.arc(videoLineStart.x, videoLineStart.y, 5, 0, 2 * Math.PI);
+          videoCtx.fill();
+        } else {
+          videoLine = {
+            start: videoLineStart,
+            end: {x: Math.floor(x), y: Math.floor(y)}
+          };
+          
+          // Draw the line
+          videoCtx.strokeStyle = '#ff0000';
+          videoCtx.lineWidth = 3;
+          videoCtx.beginPath();
+          videoCtx.moveTo(videoLine.start.x, videoLine.start.y);
+          videoCtx.lineTo(videoLine.end.x, videoLine.end.y);
+          videoCtx.stroke();
+          
+          isDrawingVideoLine = false;
+          videoLineStart = null;
+          videoCanvas.onclick = null;
+          videoCanvas.style.cursor = 'default';
+          
+          alert('Crossing line set! Continue analysis to detect crossings.');
+        }
+      };
+    }
+
+    async function startVideoAnalysis() {
+      if (!uploadedVideo) {
+        alert('Please upload a video first');
+        return;
+      }
+      
+      isAnalyzing = true;
+      document.getElementById('analysisStatus').textContent = 'Analyzing...';
+      document.getElementById('analyzeBtn').disabled = true;
+      document.getElementById('pauseBtn').disabled = false;
+      
+      uploadedVideo.currentTime = 0;
+      videoStartTime = Date.now();
+      
+      await uploadedVideo.play();
+      
+      videoAnalysisInterval = setInterval(async () => {
+        if (uploadedVideo.ended) {
+          clearInterval(videoAnalysisInterval);
+          document.getElementById('analysisStatus').textContent = 'Complete';
+          document.getElementById('analyzeBtn').disabled = false;
+          document.getElementById('pauseBtn').disabled = true;
+          
+          // Auto-save results
+          await saveVideoSession();
+          return;
+        }
+        
+        // Draw current frame
+        videoCtx.drawImage(uploadedVideo, 0, 0, videoCanvas.width, videoCanvas.height);
+        
+        // Redraw line if exists
+        if (videoLine) {
+          videoCtx.strokeStyle = '#ff0000';
+          videoCtx.lineWidth = 3;
+          videoCtx.beginPath();
+          videoCtx.moveTo(videoLine.start.x, videoLine.start.y);
+          videoCtx.lineTo(videoLine.end.x, videoLine.end.y);
+          videoCtx.stroke();
+        }
+        
+        // Get frame data and send to backend
+        const frameData = videoCanvas.toDataURL('image/jpeg', 0.8);
+        await analyzeVideoFrame(frameData, Math.floor(uploadedVideo.currentTime * 30));
+        
+        const elapsed = Math.floor((Date.now() - videoStartTime) / 1000);
+        document.getElementById('analysisDuration').textContent = elapsed + 's';
+      }, 500);
+    }
+
+    function pauseVideoAnalysis() {
+      if (videoAnalysisInterval) {
+        clearInterval(videoAnalysisInterval);
+        videoAnalysisInterval = null;
+      }
+      
+      if (uploadedVideo) {
+        uploadedVideo.pause();
+      }
+      
+      isAnalyzing = false;
+      document.getElementById('analysisStatus').textContent = 'Paused';
+      document.getElementById('analyzeBtn').disabled = false;
+      document.getElementById('pauseBtn').disabled = true;
+    }
+
+    async function analyzeVideoFrame(frameData, frameNumber) {
+      try {
+        const res = await fetch(`${API_BASE}/analyze_frame`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            frame: frameData,
+            frame_number: frameNumber,
+            crossing_line: videoLine
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          // Draw detections on canvas
+          if (data.detections) {
+            data.detections.forEach((det, idx) => {
+              const [x1, y1, x2, y2] = det.bbox;
+              
+              videoCtx.strokeStyle = '#00ff00';
+              videoCtx.lineWidth = 2;
+              videoCtx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+              
+              videoCtx.fillStyle = '#00ff00';
+              videoCtx.font = '16px Arial';
+              videoCtx.fillText(`Person ${idx + 1}`, x1, y1 - 5);
+            });
+          }
+          
+          document.getElementById('videoPeopleCount').textContent = data.people_count || 0;
+          document.getElementById('lineCrossings').textContent = data.crossed_count || 0;
+        }
+      } catch (err) {
+        console.error('Error analyzing frame:', err);
+      }
+    }
+
+    async function saveVideoSession() {
+      const peopleCount = parseInt(document.getElementById('videoPeopleCount').textContent) || 0;
+      const crossings = parseInt(document.getElementById('lineCrossings').textContent) || 0;
+      
+      try {
+        await fetch(`${API_BASE}/save_detection`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: user.id,
+            type: 'video',
+            people_count: peopleCount,
+            crossed_count: crossings
+          })
+        });
+        
+        alert('Video session saved successfully!');
+        loadHomeStats();
+      } catch (err) {
+        console.error('Error saving session:', err);
+      }
+    }
+
+    function resetVideoAnalysis() {
+      if (videoAnalysisInterval) {
+        clearInterval(videoAnalysisInterval);
+        videoAnalysisInterval = null;
+      }
+      
+      if (uploadedVideo) {
+        uploadedVideo.pause();
+        uploadedVideo = null;
+      }
+      
+      videoLine = null;
+      isAnalyzing = false;
+      
+      videoCtx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
+      
+      document.getElementById('fileName').textContent = '';
+      document.getElementById('videoPeopleCount').textContent = '0';
+      document.getElementById('lineCrossings').textContent = '0';
+      document.getElementById('analysisDuration').textContent = '0s';
+      document.getElementById('analysisStatus').textContent = 'Ready';
+      document.getElementById('analyzeBtn').disabled = true;
+      document.getElementById('pauseBtn').disabled = true;
+      document.getElementById('drawLineBtn').disabled = true;
+      videoCanvas.style.display = 'none';
+      document.getElementById('videoPlaceholder').style.display = 'block';
+      
+      fetch(`${API_BASE}/reset_video_analysis`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // ==================== WEBCAM ANALYSIS ====================
+    
+    async function startWebcamAnalysis() {
+      try {
+        const res = await fetch(`${API_BASE}/start_webcam`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          webcamActive = true;
+          webcamStartTime = Date.now();
+          
+          document.getElementById('startWebcamBtn').disabled = true;
+          document.getElementById('stopWebcamBtn').disabled = false;
+          document.getElementById('drawWebcamLineBtn').disabled = false;
+          document.getElementById('saveWebcamBtn').disabled = false;
+          document.getElementById('webcamStatus').textContent = 'Active';
+          document.getElementById('webcamPlaceholder').style.display = 'none';
+          webcamCanvas.style.display = 'block';
+          
+          webcamAnalysisInterval = setInterval(async () => {
+            await getWebcamFrame();
+            
+            const elapsed = Math.floor((Date.now() - webcamStartTime) / 1000);
+            document.getElementById('webcamSessionTime').textContent = elapsed + 's';
+          }, 300);
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        console.error('Error starting webcam:', err);
+        alert('Failed to start webcam. Make sure backend is running.');
+      }
+    }
+
+    async function getWebcamFrame() {
+      try {
+        const res = await fetch(`${API_BASE}/get_webcam_frame`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            crossing_line: webcamLine
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          const img = new Image();
+          img.onload = function() {
+            webcamCanvas.width = img.width;
+            webcamCanvas.height = img.height;
+            webcamCtx.drawImage(img, 0, 0);
+            
+            // Redraw line if exists
+            if (webcamLine) {
+              webcamCtx.strokeStyle = '#00ff00';
+              webcamCtx.lineWidth = 3;
+              webcamCtx.beginPath();
+              webcamCtx.moveTo(webcamLine.start.x, webcamLine.start.y);
+              webcamCtx.lineTo(webcamLine.end.x, webcamLine.end.y);
+              webcamCtx.stroke();
+              
+              webcamCtx.fillStyle = '#00ff00';
+              webcamCtx.font = '20px Arial';
+              webcamCtx.fillText('Crossing Line', webcamLine.start.x, webcamLine.start.y - 10);
+            }
+          };
+          img.src = 'data:image/jpeg;base64,' + data.frame;
+          
+          document.getElementById('webcamPeopleCount').textContent = data.count;
+          document.getElementById('webcamLineCrossings').textContent = data.crossed_count;
+        }
+      } catch (err) {
+        console.error('Error getting webcam frame:', err);
+      }
+    }
+
+    async function stopWebcamAnalysis() {
+      if (webcamAnalysisInterval) {
+        clearInterval(webcamAnalysisInterval);
+        webcamAnalysisInterval = null;
+      }
+      
+      webcamActive = false;
+      
+      try {
+        await fetch(`${API_BASE}/stop_webcam`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch (err) {
+        console.error('Error stopping webcam:', err);
+      }
+      
+      document.getElementById('startWebcamBtn').disabled = false;
+      document.getElementById('stopWebcamBtn').disabled = true;
+      document.getElementById('drawWebcamLineBtn').disabled = true;
+      document.getElementById('saveWebcamBtn').disabled = true;
+      document.getElementById('webcamStatus').textContent = 'Stopped';
+    }
+
+    function drawWebcamLine() {
+      if (isDrawingWebcamLine) {
+        isDrawingWebcamLine = false;
+        webcamLineStart = null;
+        webcamCanvas.style.cursor = 'default';
+        return;
+      }
+      
+      isDrawingWebcamLine = true;
+      webcamCanvas.style.cursor = 'crosshair';
+      alert('Click two points on the webcam feed to draw a crossing line');
+      
+      webcamCanvas.onclick = function(e) {
+        if (!isDrawingWebcamLine) return;
+        
+        const rect = webcamCanvas.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * webcamCanvas.width;
+        const y = ((e.clientY - rect.top) / rect.height) * webcamCanvas.height;
+        
+        if (!webcamLineStart) {
+          webcamLineStart = {x: Math.floor(x), y: Math.floor(y)};
+        } else {
+          webcamLine = {
+            start: webcamLineStart,
+            end: {x: Math.floor(x), y: Math.floor(y)}
+          };
+          
+          isDrawingWebcamLine = false;
+          webcamLineStart = null;
+          webcamCanvas.onclick = null;
+          webcamCanvas.style.cursor = 'default';
+          
+          alert('Crossing line set!');
+        }
+      };
+    }
+
+    async function saveWebcamSession() {
+      const peopleCount = parseInt(document.getElementById('webcamPeopleCount').textContent) || 0;
+      const crossings = parseInt(document.getElementById('webcamLineCrossings').textContent) || 0;
+      
+      try {
+        await fetch(`${API_BASE}/save_detection`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: user.id,
+            type: 'webcam',
+            people_count: peopleCount,
+            crossed_count: crossings
+          })
+        });
+        
+        alert('Webcam session saved successfully!');
+        loadHomeStats();
+      } catch (err) {
+        console.error('Error saving session:', err);
+      }
+    }
+
+    async function resetWebcamAnalysis() {
+      await stopWebcamAnalysis();
+      
+      webcamLine = null;
+      
+      document.getElementById('webcamPeopleCount').textContent = '0';
+      document.getElementById('webcamLineCrossings').textContent = '0';
+      document.getElementById('webcamSessionTime').textContent = '0s';
+      document.getElementById('webcamStatus').textContent = 'Inactive';
+      webcamCanvas.style.display = 'none';
+      document.getElementById('webcamPlaceholder').style.display = 'block';
+      
+      webcamCtx.clearRect(0, 0, webcamCanvas.width, webcamCanvas.height);
+      
+      try {
+        await fetch(`${API_BASE}/reset_webcam_crossings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch (err) {
+        console.error('Error resetting webcam:', err);
+      }
+    }
+
+    // ==================== ANALYTICS ====================
+    
+    async function loadAnalytics(filter) {
+      try {
+        const res = await fetch(`${API_BASE}/get_analytics/${user.id}`);
+        const data = await res.json();
+        
+        if (data.success && data.analytics.length > 0) {
+          let filteredData = data.analytics;
+          
+          if (filter === 'today') {
+            const today = new Date().toDateString();
+            filteredData = data.analytics.filter(log => {
+              const logDate = new Date(log.timestamp).toDateString();
+              return logDate === today;
+            });
+          } else if (filter === 'week') {
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            filteredData = data.analytics.filter(log => {
+              return new Date(log.timestamp) >= weekAgo;
+            });
+          }
+          
+          displayAnalytics(filteredData);
+        } else {
+          document.getElementById('chartContainer').innerHTML = 
+            '<p style="color: #ccc; text-align: center; padding-top: 50px;">No analytics data available</p>';
+        }
+      } catch (err) {
+        console.error('Error loading analytics:', err);
+        document.getElementById('chartContainer').innerHTML = 
+          '<p style="color: #ff6b6b; text-align: center; padding-top: 50px;">Error loading analytics. Please try again.</p>';
+      }
+    }
+
+    function filterAnalytics(filter) {
+      loadAnalytics(filter);
+    }
+
+    function displayAnalytics(analytics) {
+      const chartContainer = document.getElementById('chartContainer');
+      
+      if (analytics.length === 0) {
+        chartContainer.innerHTML = '<p style="color: #ccc; text-align: center; padding-top: 50px;">No data available for this period</p>';
+        return;
+      }
+      
+      chartContainer.innerHTML = '<h3 style="color: #8e2de2; margin-bottom: 20px;">Detection History</h3>';
+      
+      analytics.forEach(log => {
+        const logDiv = document.createElement('div');
+        logDiv.style.cssText = 'background: rgba(50,50,60,0.6); padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #8e2de2;';
+        
+        const timestamp = new Date(log.timestamp);
+        const timeStr = timestamp.toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        const details = log.zone_counts;
+        const type = details.type || 'unknown';
+        const crossed = details.crossed || 0;
+        
+        logDiv.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+              <div style="color: #fff; font-weight: bold; font-size: 1.1em; margin-bottom: 8px;">
+                👥 ${log.total_count} People Detected
+              </div>
+              <div style="font-size: 0.9em; color: #8e2de2;">
+                <span style="margin-right: 15px;">📹 Type: ${type.toUpperCase()}</span>
+                <span>🚶 Crossings: ${crossed}</span>
+              </div>
+            </div>
+            <div style="color: #ccc; font-size: 0.9em; text-align: right;">
+              📅 ${timeStr}
+            </div>
+          </div>
+        `;
+        
+        chartContainer.appendChild(logDiv);
+      });
+    }
+
+    function saveSettings() {
+      alert('Settings saved successfully!');
+    }
+
+    function logout() {
+      localStorage.removeItem('user');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
