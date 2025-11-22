@@ -1,0 +1,298 @@
+/* ==================== AUTHENTICATION PAGES CSS ==================== */
+/* This file is for login.html and register.html only */
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body, html {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #232526 0%, #1a1a2e 100%);
+}
+
+/* Centered background for auth */
+.center-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Auth card styles */
+.auth-card {
+  background: #181a20;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(30,30,40,0.22);
+  width: 370px;
+  max-width: 100%;
+  padding: 48px 36px 32px 36px;
+  position: relative;
+  text-align: center;
+  border: 1px solid #232526;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-header {
+  background: linear-gradient(90deg, #232a3b 60%, #8e2de2 100%);
+  color: #fff;
+  font-size: 1.5em;
+  font-weight: 700;
+  border-radius: 0 0 22px 22px;
+  padding: 18px 0 16px 0;
+  width: 75%;
+  margin: 0 auto 34px auto;
+  position: relative;
+  top: -48px;
+  box-shadow: 0 2px 12px #8e2de244;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Input fields */
+.input-group {
+  position: relative;
+  margin-bottom: 22px;
+}
+
+.input-group input {
+  background: #232a3b;
+  color: #fff;
+  border: 1px solid #8e2de2;
+  font-size: 16px;
+  border-radius: 22px;
+  padding: 15px 44px 15px 18px;
+  margin-bottom: 2px;
+  width: 100%;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.input-group input::placeholder {
+  color: #4a4a5a;
+  opacity: 1;
+}
+
+.input-group input:focus {
+  box-shadow: 0 0 0 2px #8e2de2;
+  border: 1.5px solid #8e2de2;
+  background: #2c2f3a;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.input-group input:hover {
+  border-color: #a855f7;
+}
+
+.icon {
+  color: #8e2de2;
+  font-size: 20px;
+  right: 18px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.7;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.input-group input:focus + .icon {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Buttons */
+button {
+  background: linear-gradient(90deg, #232a3b 0%, #8e2de2 100%);
+  border-radius: 22px;
+  font-size: 1.15em;
+  font-weight: 600;
+  margin-top: 18px;
+  padding: 15px 0;
+  box-shadow: 0 2px 8px #8e2de222;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #8e2de2 0%, #232a3b 100%);
+  transform: scale(1.03);
+  box-shadow: 0 4px 16px #8e2de244;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:focus {
+  outline: 2px solid #8e2de2;
+  outline-offset: 2px;
+}
+
+/* Links */
+.auth-link {
+  color: #8e2de2;
+  font-size: 16px;
+  margin-top: 28px;
+}
+
+.auth-link a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+  transition: all 0.3s ease;
+}
+
+.auth-link a:hover {
+  color: #8e2de2;
+  text-decoration: none;
+}
+
+/* Error/Success Messages */
+.message {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.95em;
+  text-align: center;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message.error {
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid #e74c3c;
+  color: #ff6b6b;
+}
+
+.message.success {
+  background: rgba(39, 174, 96, 0.2);
+  border: 1px solid #27ae60;
+  color: #2ecc71;
+}
+
+/* Loading State */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+button.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+  .auth-card {
+    width: 95vw;
+    padding: 18px 6vw 18px 6vw;
+  }
+  
+  .card-header {
+    width: 90%;
+    font-size: 1.1em;
+    top: -28px;
+    padding: 14px 0 12px 0;
+  }
+  
+  button {
+    font-size: 1em;
+    padding: 13px 0;
+  }
+  
+  .input-group input {
+    font-size: 15px;
+    padding: 13px 40px 13px 16px;
+  }
+  
+  .auth-link {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .auth-card {
+    padding: 15px 20px 15px 20px;
+  }
+  
+  .card-header {
+    font-size: 1em;
+    width: 95%;
+  }
+}
+
+/* Accessibility */
+button:focus-visible,
+.input-group input:focus-visible,
+.auth-link a:focus-visible {
+  outline: 2px solid #8e2de2;
+  outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .auth-card {
+    border: 2px solid #8e2de2;
+  }
+  
+  .input-group input {
+    border-width: 2px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
