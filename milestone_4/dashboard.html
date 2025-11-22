@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CrowdCount Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="sidebar-header">🎯 CrowdCount</div>
+      <ul>
+        <li class="active" onclick="showSection('home')" data-section="home">
+          <i class="fas fa-home"></i> Home
+        </li>
+        <li onclick="showSection('dashboard')" id="dashboardMenuItem" style="display:none;" data-section="dashboard">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </li>
+        <li onclick="showSection('image')" data-section="image">
+          <i class="fas fa-image"></i> Image Analysis
+        </li>
+        <li onclick="showSection('video')" data-section="video">
+          <i class="fas fa-film"></i> Video Analysis
+        </li>
+        <li onclick="showSection('webcam')" data-section="webcam">
+          <i class="fas fa-video"></i> Webcam Analysis
+        </li>
+        <li onclick="showSection('analytics')" data-section="analytics">
+          <i class="fas fa-chart-bar"></i> Analytics
+        </li>
+        <li onclick="showSection('settings')" data-section="settings">
+          <i class="fas fa-cog"></i> Settings
+        </li>
+        <li onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </li>
+      </ul>
+    </aside>
+
+    <main class="main">
+      <header class="dashboard-header">
+        <h1>Hello <span id="username">User</span></h1>
+        <p class="subtitle">Real-time crowd monitoring and analytics</p>
+      </header>
+
+      <!-- Home Section -->
+      <div id="homeSection" class="content-section">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-title">👥 Total People Today</div>
+            <div class="stat-value" id="totalCount">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">🔄 Active Sessions</div>
+            <div class="stat-value" id="activeSessions">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">📊 Total Detections</div>
+            <div class="stat-value" id="detectionRate">0</div>
+          </div>
+        </div>
+
+        <div class="chart-section">
+          <h2 class="section-title">📈 Detection Trends by Type</h2>
+          <p style="color: #ccc; margin-bottom: 15px;">
+            People count across webcam, video, and image analysis sessions
+          </p>
+          <div class="chart-container" id="homeLineChartContainer">
+            <p style="color: #ccc; text-align: center; padding: 50px 0;">
+              Loading detection trends...
+            </p>
+          </div>
+        </div>
+
+        <div class="chart-section">
+          <h2 class="section-title">📊 Daily Detection Summary</h2>
+          <p style="color: #ccc; margin-bottom: 15px;">
+            Total people detected each day (Last 7 days)
+          </p>
+          <div class="chart-container" id="homeDailyChartContainer">
+            <p style="color: #ccc; text-align: center; padding: 50px 0;">
+              Loading daily summary...
+            </p>
+          </div>
+        </div>
+
+        <div class="video-section">
+          <h2 class="section-title">🎬 Quick Start</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">
+            Start analyzing people with our advanced detection system
+          </p>
+          <div class="video-controls">
+            <button class="btn" onclick="showSection('image')">
+              <i class="fas fa-image"></i> Analyze Image
+            </button>
+            <button class="btn btn-success" onclick="showSection('webcam')">
+              <i class="fas fa-video"></i> Start Webcam Analysis
+            </button>
+            <button class="btn" onclick="showSection('video')">
+              <i class="fas fa-film"></i> Upload Video
+            </button>
+            <button class="btn" onclick="showSection('analytics')">
+              <i class="fas fa-chart-bar"></i> View Analytics
+            </button>
+          </div>
+        </div>
+
+        <div class="video-section">
+          <h2 class="section-title">📊 Recent Activity</h2>
+          <div id="recentActivity" style="color: #ccc;">
+            Loading recent detections...
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Section (Admin Panel) -->
+      <div id="dashboardSection" class="content-section" style="display:none;">
+        <!-- Admin Stats Overview -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-title">👥 Total Users</div>
+            <div class="stat-value" id="adminTotalUsers">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">📊 Total Detections</div>
+            <div class="stat-value" id="adminTotalDetections">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">📈 Today's Detections</div>
+            <div class="stat-value" id="adminTodayDetections">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">🎯 Active Zones</div>
+            <div class="stat-value" id="adminActiveZones">0</div>
+          </div>
+        </div>
+
+        <!-- User Management -->
+        <div class="video-section">
+          <h2 class="section-title">👥 User Management</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Manage system users and permissions</p>
+          
+          <div class="video-controls" style="margin-bottom: 20px;">
+            <button class="btn btn-success" onclick="window.showAddUserModal()">
+              <i class="fas fa-user-plus"></i> Add User
+            </button>
+            <button class="btn" onclick="window.refreshUserList()">
+              <i class="fas fa-sync"></i> Refresh
+            </button>
+          </div>
+
+          <table class="analytics-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userManagementTable">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: #ccc;">
+                  Loading users...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Zone Management -->
+        <div class="video-section">
+          <h2 class="section-title">🎯 Camera Zone Management</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Configure detection zones and thresholds</p>
+          
+          <div class="video-controls" style="margin-bottom: 20px;">
+            <button class="btn" onclick="window.refreshZoneList()">
+              <i class="fas fa-sync"></i> Refresh Zones
+            </button>
+            <button class="btn btn-warning" onclick="window.showBulkThresholdModal()">
+              <i class="fas fa-sliders-h"></i> Set Thresholds
+            </button>
+          </div>
+
+          <div id="zoneManagementList" class="zone-list">
+            <p style="color: #ccc;">Loading zones...</p>
+          </div>
+        </div>
+
+        <!-- User Activity Logs -->
+        <div class="video-section">
+          <h2 class="section-title">📋 User Activity Logs</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Monitor user actions and system events</p>
+          
+          <div class="video-controls" style="margin-bottom: 20px;">
+            <button class="btn" onclick="window.refreshActivityLogs()">
+              <i class="fas fa-sync"></i> Refresh
+            </button>
+          </div>
+
+          <table class="analytics-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Activity</th>
+                <th>Details</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="activityLogsTable">
+              <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: #ccc;">
+                  Loading activity logs...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Export Data -->
+        <div class="video-section">
+          <h2 class="section-title">📥 Export Historical Data</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Export detection data in CSV or PDF format</p>
+          
+          <div class="settings-card">
+            <h3>Date Range Selection</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+              <div class="input-group">
+                <label style="color: #8e2de2; display: block; margin-bottom: 5px;">Start Date:</label>
+                <input type="date" id="exportStartDate" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #8e2de2; background: #232a3b; color: #fff;">
+              </div>
+              <div class="input-group">
+                <label style="color: #8e2de2; display: block; margin-bottom: 5px;">End Date:</label>
+                <input type="date" id="exportEndDate" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #8e2de2; background: #232a3b; color: #fff;">
+              </div>
+            </div>
+            
+            <div class="video-controls">
+              <button class="btn btn-success" onclick="window.exportDataCSV()">
+                <i class="fas fa-file-csv"></i> Export as CSV
+              </button>
+              <button class="btn btn-danger" onclick="window.exportDataPDF()">
+                <i class="fas fa-file-pdf"></i> Export as PDF
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert Rules & Settings -->
+        <div class="video-section">
+          <h2 class="section-title">⚙️ Alert Rules & Settings</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Configure system-wide alert thresholds and rules</p>
+          
+          <div class="settings-card">
+            <h3>Global Threshold Settings</h3>
+            <div id="globalThresholdSettings">
+              <p style="color: #ccc;">Loading threshold settings...</p>
+            </div>
+            
+            <div style="margin-top: 20px;">
+              <button class="btn" onclick="window.saveGlobalSettings()">
+                <i class="fas fa-save"></i> Save Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Analysis Section -->
+      <div id="imageSection" class="content-section" style="display:none;">
+        <div class="video-section">
+          <h2 class="section-title">🖼️ Image Analysis</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Upload an image to detect and count people with zone detection</p>
+          
+          <div class="video-controls">
+            <label for="imageUpload" class="upload-label">
+              <i class="fas fa-upload"></i> Upload Image
+            </label>
+            <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)">
+            <span class="file-name" id="imageFileName"></span>
+            <button class="btn btn-success" onclick="analyzeImage()" id="analyzeImageBtn" disabled>
+              <i class="fas fa-search"></i> Analyze
+            </button>
+            <button class="btn btn-warning" onclick="drawImageZone()" id="drawImageZoneBtn" disabled>
+              <i class="fas fa-draw-polygon"></i> Draw Zone
+            </button>
+            <button class="btn" onclick="toggleHeatmap()" id="heatmapToggle">
+              <i class="fas fa-fire"></i> Heatmap: OFF
+            </button>
+            <button class="btn" onclick="saveImageSession()" id="saveImageBtn" disabled>
+              <i class="fas fa-save"></i> Save Results
+            </button>
+            <button class="btn btn-danger" onclick="resetImageAnalysis()">
+              <i class="fas fa-redo"></i> Reset
+            </button>
+          </div>
+
+          <div id="imageDrawingInstructions" class="drawing-instructions" style="display:none;">
+            <strong>🎯 Drawing Zone:</strong> Click on the image to create polygon points. Click the first point again to close the zone, or press 'Escape' to cancel.
+          </div>
+
+          <div class="video-container" id="imageContainer">
+            <canvas id="imageCanvas" style="display:none;"></canvas>
+            <span class="placeholder" id="imagePlaceholder">Upload an image to begin</span>
+          </div>
+
+          <div class="results-panel">
+            <div class="result-item">
+              <div class="result-label">👥 People Detected</div>
+              <div class="result-value" id="imagePeopleCount">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">🎯 Zones Defined</div>
+              <div class="result-value" id="imageZoneCount">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">📊 Status</div>
+              <div class="result-value" id="imageStatus" style="font-size: 1.2em;">Ready</div>
+            </div>
+          </div>
+
+          <div id="imageZoneList" class="zone-list" style="display:none;">
+            <h3 style="color: #8e2de2; margin-bottom: 10px;">Zone Counts:</h3>
+            <div id="imageZones"></div>
+          </div>
+
+          <div id="imageHeatmapDisplay" class="heatmap-display">
+            <h3 style="color: #8e2de2; margin-bottom: 10px;">🔥 Heatmap Visualization:</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Analysis Section -->
+      <div id="videoSection" class="content-section" style="display:none;">
+        <div class="video-section">
+          <h2 class="section-title">🎬 Video Analysis</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Upload a video to analyze people count and track line crossings</p>
+          
+          <div class="video-controls">
+            <label for="videoUpload" class="upload-label">
+              <i class="fas fa-upload"></i> Upload Video
+            </label>
+            <input type="file" id="videoUpload" accept="video/*" onchange="handleVideoUpload(event)">
+            <span class="file-name" id="fileName"></span>
+            <button class="btn btn-success" onclick="startVideoAnalysis()" id="analyzeBtn" disabled>
+              <i class="fas fa-play"></i> Start Analysis
+            </button>
+            <button class="btn btn-danger" onclick="pauseVideoAnalysis()" id="pauseBtn" disabled>
+              <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="btn btn-warning" onclick="drawVideoLine()" id="drawLineBtn" disabled>
+              <i class="fas fa-minus"></i> Draw Line
+            </button>
+            <button class="btn btn-warning" onclick="drawVideoZone()" id="drawVideoZoneBtn" disabled>
+              <i class="fas fa-draw-polygon"></i> Draw Zone
+            </button>
+            <button class="btn" onclick="saveVideoSession()" id="saveVideoBtn" disabled>
+              <i class="fas fa-save"></i> Save Results
+            </button>
+            <button class="btn btn-danger" onclick="resetVideoAnalysis()">
+              <i class="fas fa-redo"></i> Reset
+            </button>
+          </div>
+
+          <div id="videoDrawingInstructions" class="drawing-instructions" style="display:none;">
+            <strong id="videoDrawingMode">🎯 Drawing Mode:</strong>
+          </div>
+
+          <div class="video-container" id="videoContainer">
+            <canvas id="videoCanvas" style="display:none;"></canvas>
+            <span class="placeholder" id="videoPlaceholder">Upload a video to begin</span>
+          </div>
+
+          <div class="results-panel">
+            <div class="result-item">
+              <div class="result-label">👥 Max People</div>
+              <div class="result-value" id="videoPeopleCount">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">➡️ Line Crossings</div>
+              <div class="result-value" id="lineCrossings">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">🎯 Zones</div>
+              <div class="result-value" id="videoZoneCount">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">⏱️ Duration</div>
+              <div class="result-value" id="analysisDuration">0s</div>
+            </div>
+          </div>
+
+          <div id="videoZoneList" class="zone-list" style="display:none;">
+            <h3 style="color: #8e2de2; margin-bottom: 10px;">Zone Counts:</h3>
+            <div id="videoZones"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webcam Analysis Section -->
+      <div id="webcamSection" class="content-section" style="display:none;">
+        <div class="video-section">
+          <h2 class="section-title">📹 Webcam Analysis</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Real-time people detection from your webcam</p>
+          
+          <div class="video-controls">
+            <button class="btn btn-success" onclick="startWebcam()" id="startWebcamBtn">
+              <i class="fas fa-video"></i> Start Webcam
+            </button>
+            <button class="btn btn-danger" onclick="stopWebcam()" id="stopWebcamBtn" disabled>
+              <i class="fas fa-stop"></i> Stop Webcam
+            </button>
+            <button class="btn btn-warning" onclick="drawWebcamLine()" id="drawWebcamLineBtn" disabled>
+              <i class="fas fa-minus"></i> Draw Line
+            </button>
+            <button class="btn btn-warning" onclick="drawWebcamZone()" id="drawWebcamZoneBtn" disabled>
+              <i class="fas fa-draw-polygon"></i> Draw Zone
+            </button>
+            <button class="btn" onclick="toggleHeatmap()" id="webcamHeatmapToggle">
+              <i class="fas fa-fire"></i> Heatmap: OFF
+            </button>
+            <button class="btn" onclick="saveWebcamSession()" id="saveWebcamBtn" disabled>
+              <i class="fas fa-save"></i> Save Results
+            </button>
+            <button class="btn btn-danger" onclick="resetWebcamCrossings()">
+              <i class="fas fa-redo"></i> Reset Crossings
+            </button>
+          </div>
+
+          <div id="webcamDrawingInstructions" class="drawing-instructions" style="display:none;">
+            <strong id="webcamDrawingMode">🎯 Drawing Mode:</strong>
+          </div>
+
+          <div class="video-container" id="webcamContainer">
+            <canvas id="webcamCanvas" style="display:none;"></canvas>
+            <span class="placeholder" id="webcamPlaceholder">Click "Start Webcam" to begin</span>
+          </div>
+
+          <div class="results-panel">
+            <div class="result-item">
+              <div class="result-label">👥 Current People</div>
+              <div class="result-value" id="webcamPeopleCount">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">📈 Max People</div>
+              <div class="result-value" id="webcamMaxCount">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">➡️ Crossings</div>
+              <div class="result-value" id="webcamCrossings">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">🎯 Zones</div>
+              <div class="result-value" id="webcamZoneCount">0</div>
+            </div>
+          </div>
+
+          <div id="webcamZoneList" class="zone-list" style="display:none;">
+            <h3 style="color: #8e2de2; margin-bottom: 10px;">Zone Counts:</h3>
+            <div id="webcamZones"></div>
+          </div>
+
+          <div class="live-chart-container" style="display:none;" id="liveChartDisplay">
+            <h3 style="color: #8e2de2; margin-bottom: 10px;">📊 Live People Count</h3>
+          </div>
+
+          <div class="live-chart-container" style="display:none;" id="zoneChartDisplay">
+            <h3 style="color: #8e2de2; margin-bottom: 10px;">🎯 Zone Distribution</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Section -->
+      <div id="analyticsSection" class="content-section" style="display:none;">
+        <div class="analytics-section">
+          <h2 class="section-title">📊 Analytics Dashboard</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">View your detection history and statistics</p>
+
+          <div class="filter-tabs">
+            <div class="filter-tab active" onclick="loadAnalytics('all')">All</div>
+            <div class="filter-tab" onclick="loadAnalytics('today')">Today</div>
+            <div class="filter-tab" onclick="loadAnalytics('week')">This Week</div>
+            <div class="filter-tab" onclick="loadAnalytics('month')">This Month</div>
+          </div>
+
+          <table class="analytics-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Type</th>
+                <th>People Count</th>
+                <th>Zones</th>
+              </tr>
+            </thead>
+            <tbody id="analyticsTableBody">
+              <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: #ccc;">
+                  Loading analytics data...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Settings Section -->
+      <div id="settingsSection" class="content-section" style="display:none;">
+        <div class="analytics-section">
+          <h2 class="section-title">⚙️ Settings</h2>
+          <p style="color: #ccc; margin-bottom: 20px;">Configure your application preferences</p>
+
+          <div class="settings-card">
+            <h3>User Information</h3>
+            <div class="setting-item">
+              <span class="setting-label">Username</span>
+              <span class="setting-value" id="settingsUsername">-</span>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Email</span>
+              <span class="setting-value" id="settingsEmail">-</span>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3>Detection Settings</h3>
+            <div class="setting-item">
+              <span class="setting-label">Enable Heatmap</span>
+              <label style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="enableHeatmapSetting" onchange="updateHeatmapSetting(this.checked)">
+                <span>Show heatmap overlay</span>
+              </label>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Enable Alerts</span>
+              <label style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="enableAlertsSetting" checked onchange="updateAlertsSetting(this.checked)">
+                <span>Play sound alerts</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3>Zone Thresholds</h3>
+            <div id="thresholdsList" style="color: #ccc;">
+              No zone thresholds set yet. Create zones in analysis mode to set thresholds.
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3>Account Actions</h3>
+            <button class="btn btn-danger" onclick="logout()" style="width: auto;">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="alertContainer"></div>
+
+  <!-- Modal for Add User -->
+  <div id="addUserModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
+    <div style="background:#181a20; border-radius:12px; padding:30px; max-width:500px; width:90%;">
+      <h2 style="color:#8e2de2; margin-bottom:20px;">Add New User</h2>
+      <div style="margin-bottom:15px;">
+        <input type="text" id="newUsername" placeholder="Username" style="width:100%; padding:10px; border-radius:8px; border:1px solid #8e2de2; background:#232a3b; color:#fff; margin-bottom:10px;">
+        <input type="email" id="newUserEmail" placeholder="Email" style="width:100%; padding:10px; border-radius:8px; border:1px solid #8e2de2; background:#232a3b; color:#fff; margin-bottom:10px;">
+        <input type="password" id="newUserPassword" placeholder="Password" style="width:100%; padding:10px; border-radius:8px; border:1px solid #8e2de2; background:#232a3b; color:#fff; margin-bottom:10px;">
+        <select id="newUserRole" style="width:100%; padding:10px; border-radius:8px; border:1px solid #8e2de2; background:#232a3b; color:#fff;">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-success" onclick="window.addNewUser()" style="flex:1;">
+          <i class="fas fa-check"></i> Add User
+        </button>
+        <button class="btn btn-danger" onclick="window.closeAddUserModal()" style="flex:1;">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRITICAL: Load scripts in correct order -->
+  <script src="dashboard-script.js"></script>
+  <script src="admin-script.js"></script>
+</body>
+</html>
